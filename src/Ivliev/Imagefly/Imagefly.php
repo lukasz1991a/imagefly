@@ -2,6 +2,7 @@
 
 namespace Ivliev\Imagefly;
 
+use Illuminate\Support\Facades\App;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class Imagefly
@@ -166,9 +167,18 @@ class Imagefly
     {
         // Get values from request
         $params = \Request::route('params');
-        $filepath = $this->config['abs_path'] . '/' . \Request::route('imagepath');
-        
-        // echo $params; exit;
+        $path = explode('/', \Request::route('imagepath'));
+        if(trans('routes.files.path') == $path[0])
+        {
+            $key = array_search($path[1], array_column(trans('routes.files'), 'name'));
+            $data = trans('routes.files.'.$key);
+            $filepath = App::make($data['model'])->getPathByAlias($path[2]);
+        } else {
+            $filepath = '/' . \Request::route('imagepath');
+        }
+            $filepath = $this->config['abs_path'] . $filepath;
+        if(!file_exists($filepath))
+            $filepath = $this->config['abs_path'] . '/media/default/noImage.jpg';
         
         // If enforcing params, ensure it's a match
         if ($this->config['enforce_presets'] and ! in_array($params, $this->config['presets']))
