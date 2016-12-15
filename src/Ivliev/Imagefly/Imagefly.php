@@ -172,7 +172,7 @@ class Imagefly
         {
             $key = array_search($path[1], array_column(trans('routes.files'), 'name'));
             $data = trans('routes.files.'.$key);
-            $filepath = App::make($data['model'])->getPathByAlias($path[2]);
+            $filepath = App::make($data['model'])->getPathByAlias(last($path));
         } else {
             $filepath = '/' . \Request::route('imagepath');
         }
